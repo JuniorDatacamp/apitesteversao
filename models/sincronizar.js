@@ -1,0 +1,1 @@
+// Classe não implementada.
