@@ -6,7 +6,7 @@ const format = require('pg-format');
 const SqlProdutoApp =
     "   select    "+
     "   p.pro_id, pro_referencia, pro_ativo, pro_ean1, p.dep_id, dep_descricao, p.mrc_id, mrc_descricao,   "+
-    "   pro_descricao, pro_observacoes, pro_unidade, pro_embunidade, pro_estoque, pro_quant_unid,    "+
+    "   pro_descricao, pro_observacoes, pro_unidade, pro_embunidade, pro_estoque, pro_quant_unid, pro_fracionado,  "+
     "   case    "+
     "       when pro_preco_fixo = 'S' then pro_vlrprazo    "+
     "       else pro_vlrprazo + round(pro_vlrprazo * {0} / 100, 3)    "+
@@ -23,6 +23,10 @@ const SqlProdutoApp =
     "       when pro_preco_fixo = 'S' then pro_vlrminimo   "+
     "       else pro_vlrminimo + round(pro_vlrminimo * {0} / 100, 3)   "+
     "   end as pro_vlrminimo,  "+
+    "   case   "+
+    "       when pro_preco_fixo = 'S' then pro_vlrmaximo   "+
+    "       else pro_vlrmaximo + round(pro_vlrmaximo * {0} / 100, 3)   "+
+    "   end as pro_vlrmaximo,  "+
     "   case when (cast(now() as date)) between prm_dt_inicial and prm_dt_final then   "+
     "       case   "+
     "           when pro_preco_fixo = 'S' then cast(coalesce(ipr_vlr_promocao, 0) as numeric(15,3))   "+
