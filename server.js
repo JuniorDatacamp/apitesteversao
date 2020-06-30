@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
 // Dependencias
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -25,10 +28,9 @@ class App {
     routes() {
         let router;
         router = express.Router();
-        this.api.use('/api', cors(), require('./routes/api'));
         this.api.use('/login', cors(), require('./routes/login'));
         this.api.use('/logout', cors(), require('./routes/logout'));
-        this.api.use('/painel', cors(), require('./routes/painel'));
+        this.api.use('/api', cors(), require('./routes/api'));
     }
 }
 

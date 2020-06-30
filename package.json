@@ -1,7 +1,7 @@
 {
-  "name": "serverpaineldc",
+  "name": "api-dfv",
   "version": "2.0.0",
-  "description": "API em node.js e POSTGRESQL para controle de clientes Datacamp",
+  "description": "API em node.js e POSTGRESQL para comunicação entre sistema integrado e App DFV",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,8 +10,8 @@
   },
   "keywords": [
     "DATACAMP",
-    "SERVER",
-    "PAINELDC",
+    "API",
+    "DFV",
     "NODE.JS",
     "POSTGRESQL"
   ],
@@ -21,12 +21,12 @@
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "crypto-gcm": "0.0.9",
-    "express": "^4.17.1",
+    "express": "^4.16.3",
     "helmet": "^3.21.3",
     "jwt-simple": "^0.5.5",
-    "moment": "^2.22.2",
-    "nodemailer": "^6.4.6",
-    "pg": "^8.0.3",
+    "moment": "^2.24.0",
+    "nodemailer": "^6.4.5",
+    "pg": "^7.18.2",
     "pg-format": "^1.0.4",
     "request": "^2.88.2"
   },
