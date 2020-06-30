@@ -1,16 +1,16 @@
 const format = require('pg-format');
 const Configuracao = require('../config/database');
 const sqlDepartamentos = 
-    'select dep_id, dep_descricao, dep_desconto, dep_coeficiente, dep_situacao from departamento ';
+    'select dep_id, dep_descricao, dep_desconto, dep_coeficiente, dep_situacao, dep_acesso_api from departamento ';
 
 const sqlOrderby =
     ' order by dep_id ';
 
 const insertDepartamento =
     `   insert into departamento 
-            (dep_id, dep_descricao, dep_desconto, dep_coeficiente, dep_situacao)
+            (dep_id, dep_descricao, dep_desconto, dep_coeficiente, dep_situacao, dep_acesso_api)
         values 
-            ($1, $2, $3, $4, $5) `;
+            ($1, $2, $3, $4, $5, $6) `;
 
 const deleteDepartamento =
     `   WITH retorno AS 
@@ -20,7 +20,7 @@ const deleteDepartamento =
 
 const updateDepartamento =
     `   update departamento 
-            set dep_descricao = $2, dep_desconto = $3, dep_coeficiente = $4, dep_situacao = $5, dep_dt_ultima_atualizacao = now() AT TIME ZONE 'America/Sao_Paulo'
+            set dep_descricao = $2, dep_desconto = $3, dep_coeficiente = $4, dep_situacao = $5, dep_acesso_api = $6, dep_dt_ultima_atualizacao = now() AT TIME ZONE 'America/Sao_Paulo'
         where
             dep_id = $1 `;
 
@@ -109,7 +109,7 @@ exports.update = function(objDepartamento){
 
                 ConexaoBanco.query(updateDepartamento, [
                     element.dep_id, element.dep_descricao, element.dep_desconto, 
-                    element.dep_coeficiente, element.dep_situacao
+                    element.dep_coeficiente, element.dep_situacao, element.dep_acesso_api
                 ], (error, results) => {
 
                     if (error){

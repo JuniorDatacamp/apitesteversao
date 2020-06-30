@@ -31,7 +31,6 @@ class App {
         this.api.use('/login', cors(), require('./routes/login'));
         this.api.use('/logout', cors(), require('./routes/logout'));
         this.api.use('/api', cors(), require('./routes/api'));
-        this.api.use('/painel', cors(), require('./routes/painel'));        
     }
 }
 

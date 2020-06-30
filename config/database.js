@@ -107,39 +107,7 @@ function createPool() {
     return pool;
 };
 
-function createPoolPainel(){
-
-    //variaveis de ambiente para configuração de acesso aos dados.
-    const hostPainel = (process.env.BD_HOST_PAINEL);
-    const databasePainel = (process.env.BD_BASE_PAINEL);
-    const bdUserPainel = (process.env.BD_USER_PAINEL);
-    const bdKeyPainel = (process.env.BD_KEY_PAINEL);
-
-    const configPainel = {
-        host: hostPainel,
-        port: 5432,
-        database: databasePainel,
-        user: bdUserPainel,
-        password: bdKeyPainel,
-        ssl: {
-            rejectUnauthorized: false,
-        }
-        // ,
-        // statement_timeout: 30000,
-        // query_timeout: 30000
-    };
-
-    const poolPainel = new pg.Pool(configPainel);    
-
-    poolPainel.on("error", function(err, client) {
-        console.error("**Falha ao tentar conectar com banco de dados do painel de licença.**", err.message, err.stack);
-    });
-
-    return poolPainel
-}
-
 exports.conexao       = createPool();
-exports.conexaoPainel = createPoolPainel();
 
 exports.formatSql = function formatSql(tipoSql, tabela, obj, parametro){
 

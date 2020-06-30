@@ -4,58 +4,65 @@ const regioes = require('../models/regioes');
 const format = require('pg-format');
 
 const SqlProdutoApp =
-    "   select    "+
-    "   p.pro_id, pro_referencia, pro_ativo, pro_ean1, p.dep_id, dep_descricao, p.mrc_id, mrc_descricao,   "+
-    "   pro_descricao, pro_observacoes, pro_unidade, pro_embunidade, pro_estoque, pro_quant_unid, pro_fracionado,  "+
-    "   case    "+
-    "       when pro_preco_fixo = 'S' then pro_vlrprazo    "+
-    "       else pro_vlrprazo + round(pro_vlrprazo * {0} / 100, 3)    "+
-    "   end as pro_vlrprazo,   "+
-    "   case    "+
-    "       when pro_preco_fixo = 'S' then pro_vlratacado    "+
-    "       else pro_vlratacado + round(pro_vlratacado * {0} / 100, 3)    "+
-    "   end as pro_vlratacado,   "+
-    "   case    "+
-    "       when pro_preco_fixo = 'S' then pro_vlrvenda    "+
-    "       else pro_vlrvenda + round(pro_vlrvenda * {0} / 100, 3)    "+
-    "   end as pro_vlrvenda,   "+
-    "   case   "+
-    "       when pro_preco_fixo = 'S' then pro_vlrminimo   "+
-    "       else pro_vlrminimo + round(pro_vlrminimo * {0} / 100, 3)   "+
-    "   end as pro_vlrminimo,  "+
-    "   case   "+
-    "       when pro_preco_fixo = 'S' then pro_vlrmaximo   "+
-    "       else pro_vlrmaximo + round(pro_vlrmaximo * {0} / 100, 3)   "+
-    "   end as pro_vlrmaximo,  "+
-    "   case when (cast(now() as date)) between prm_dt_inicial and prm_dt_final then   "+
-    "       case   "+
-    "           when pro_preco_fixo = 'S' then cast(coalesce(ipr_vlr_promocao, 0) as numeric(15,3))   "+
-    "           else cast(coalesce(ipr_vlr_promocao, 0) as numeric(15,3)) + round(cast(coalesce(ipr_vlr_promocao, 0) as numeric(15,3)) * {0} / 100, 3)  "+
-    "       end  "+
-    "   end as vlr_promocao, "+
-    "       pro_dtaltpreco, pro_descmax, pro_imp_catalogo, pro_troca,  "+
-    "   case  "+
-    "       when (cast(now() as date) - cast(pro_datacadastro as date) <= 7) then '#006EAD'  "+
-    "       when (cast(now() as date)) between prm_dt_inicial and prm_dt_final then '#0F8318'  "+
-    "       when pro_estoque <= 0 then '#D00303'  "+
-    "       when pro_estoque > 0 then '#000000'  "+
-    "   else  "+
-    "       '#000000'  "+
-    "   end as corlegenda,  "+
-    "   pro_datacadastro, "+
-    "   case when (cast(now() as date)) between prm_dt_inicial and prm_dt_final then prm_dt_inicial end as prm_dt_inicial,  "+
-    "   case when (cast(now() as date)) between prm_dt_inicial and prm_dt_final then prm_dt_final end as prm_dt_final "+
-    "   %s  " +
-    "   from  "+
-    "       produto p  "+
-    "   inner join  "+
-    "       departamento d on p.dep_id = d.dep_id  "+
-    "   left join  "+
-    "       marca m on p.mrc_id = m.mrc_id  "+
-    "   left join  "+
-    "       item_promocao i on p.pro_id = i.pro_id  "+
-    "   left join  "+
-    "       promocao c on i.prm_id = c.prm_id  "
+    `   select    
+       p.pro_id, pro_referencia,        
+       case 
+   	        when dep_acesso_api = 'N' 
+	        then 'I'
+	    else
+	 	    pro_ativo
+        end as pro_ativo,       
+       pro_ean1, p.dep_id, dep_descricao, p.mrc_id, mrc_descricao,   
+       pro_descricao, pro_observacoes, pro_unidade, pro_embunidade, pro_estoque, pro_quant_unid, pro_fracionado,  
+       case    
+           when pro_preco_fixo = 'S' then pro_vlrprazo    
+           else pro_vlrprazo + round(pro_vlrprazo * {0} / 100, 3)    
+       end as pro_vlrprazo,   
+       case    
+           when pro_preco_fixo = 'S' then pro_vlratacado    
+           else pro_vlratacado + round(pro_vlratacado * {0} / 100, 3)    
+       end as pro_vlratacado,   
+       case    
+           when pro_preco_fixo = 'S' then pro_vlrvenda    
+           else pro_vlrvenda + round(pro_vlrvenda * {0} / 100, 3)    
+       end as pro_vlrvenda,   
+       case   
+           when pro_preco_fixo = 'S' then pro_vlrminimo   
+           else pro_vlrminimo + round(pro_vlrminimo * {0} / 100, 3)   
+       end as pro_vlrminimo,  
+       case   
+           when pro_preco_fixo = 'S' then pro_vlrmaximo   
+           else pro_vlrmaximo + round(pro_vlrmaximo * {0} / 100, 3)   
+       end as pro_vlrmaximo,  
+       case when (cast(now() as date)) between prm_dt_inicial and prm_dt_final then   
+           case   
+               when pro_preco_fixo = 'S' then cast(coalesce(ipr_vlr_promocao, 0) as numeric(15,3))   
+               else cast(coalesce(ipr_vlr_promocao, 0) as numeric(15,3)) + round(cast(coalesce(ipr_vlr_promocao, 0) as numeric(15,3)) * {0} / 100, 3)  
+           end  
+       end as vlr_promocao, 
+           pro_dtaltpreco, pro_descmax, pro_imp_catalogo, pro_troca,  
+       case  
+           when (cast(now() as date) - cast(pro_datacadastro as date) <= 7) then '#006EAD'  
+           when (cast(now() as date)) between prm_dt_inicial and prm_dt_final then '#0F8318'  
+           when pro_estoque <= 0 then '#D00303'  
+           when pro_estoque > 0 then '#000000'  
+       else  
+           '#000000'  
+       end as corlegenda,  
+       pro_datacadastro, 
+       case when (cast(now() as date)) between prm_dt_inicial and prm_dt_final then prm_dt_inicial end as prm_dt_inicial,  
+       case when (cast(now() as date)) between prm_dt_inicial and prm_dt_final then prm_dt_final end as prm_dt_final 
+       %s  
+       from  
+           produto p  
+       inner join  
+           departamento d on p.dep_id = d.dep_id  
+       left join  
+           marca m on p.mrc_id = m.mrc_id  
+       left join  
+           item_promocao i on p.pro_id = i.pro_id  
+       left join  
+           promocao c on i.prm_id = c.prm_id `;
 
 const sqlOrderby =
     ' order by pro_descricao ';    
@@ -189,9 +196,9 @@ exports.retornarProdutosApp = function retornarProdutosApp(package){
 
                 if (package.pacotefull){
                     sqlProduto = format(sqlProduto, '');
-                    addWhere = " where pro_ativo = 'A' ";
+                    addWhere = " where pro_ativo = 'A' and dep_acesso_api = 'S' ";
                 }else{
-                    addWhere = " where prm_dt_ultima_atualizacao > $1 or ipr_dt_ultima_atualizacao > $1 or pro_dt_ultima_atualizacao > $1 and pro_ativo <> 'B' ";
+                    addWhere = " where prm_dt_ultima_atualizacao > $1 or ipr_dt_ultima_atualizacao > $1 or pro_dt_ultima_atualizacao > $1 or dep_dt_ultima_atualizacao > $1 and pro_ativo <> 'B' ";
                     params.push(package.data);
                     var addColunaProduto  = format(colunaProdutoNovo, package.data, package.data);
                     sqlProduto            = format(sqlProduto, addColunaProduto);

@@ -10,6 +10,7 @@ class departamento {
             this.dep_desconto       = body.dep_desconto,
             this.dep_coeficiente    = body.dep_coeficiente,
             this.dep_situacao       = body.dep_situacao;
+            this.dep_acesso_api     = body.dep_acesso_api;
     }
 }
 
@@ -71,8 +72,8 @@ exports.alterar = function(req, res){
         res.status(400).json({
             mensagem: 'A requisição não está de acordo com o formato esperado. Verifique o JSON (body) que está sendo enviado.'
         }); 
-    }    
-    
+    }
+   
     var promisesDepto;
     promisesDepto = departamentosModel.update(arrayDepto);
 

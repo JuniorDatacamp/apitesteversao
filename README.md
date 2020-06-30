@@ -23,12 +23,9 @@ Configuração de cliente:
 
 Configuração de painel:
 <br>
-<strong>BD_HOST_PAINEL</strong> (host)<br>
-<strong>BD_BASE_PAINEL</strong> (database)<br>
-<strong>BD_USER_PAINEL</strong> (user)<br>
-<strong>BD_KEY_PAINEL</strong> (password)<br>
+<strong>HOST_PAINEL</strong> (link painel: http://api.datacamp.net.br )<br>
 
 3 - Rodar o comando nodemon. Pronto, servidor rodando!
 
 Link documentação das rotas.
-https://documenter.getpostman.com/view/6708304/SzzdCfso
+https://documenter.getpostman.com/view/6708304/SzfCUm3f?version=latest

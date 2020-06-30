@@ -16,7 +16,7 @@ const ultMovRetaguarda = require('../models/ultMovRetaguarda');
 exports.sincronizandoApp = function(req, res, isFull){
 
     const tipoToken = jwt.getTipoToken();
-    const token = req.headers['x-access-token'];    
+    const token = req.headers['x-access-token'];
     
     const packageSync = {
         codVendedor : (jwt.getToken(res, token, tipoToken.app).iss),
@@ -36,7 +36,7 @@ exports.sincronizandoApp = function(req, res, isFull){
         configuracoes.retornarConfiguracoesApp(packageSync),
         empresas.retornarEmpresaApp(packageSync),
         ocorrencias.retornarOcorrencias(packageSync),
-        clientes.documentosExistentes()
+        clientes.documentosExistentes(packageSync)
     ])
     .then(
         (resultados) => {

@@ -211,7 +211,7 @@ function formatSqlSyncronizacaoApp (package){
     return {sql: selectClientes, parametros: params};
 }
 
-exports.clienteDuplicado = function clienteDuplicado(cpf, cnpj){
+exports.clienteDuplicado = function clienteDuplicado(cpf, cnpj){    
     
     const ConexaoBanco = Configuracao.conexao;
     const selectClienteDuplicado = sqlClienteDuplicado;
@@ -580,20 +580,23 @@ exports.delete = function (idCliente){
     });
 };
 
-exports.documentosExistentes = function (){
+exports.documentosExistentes = function (package){
 
-    const ConexaoBanco = Configuracao.conexao;    
-
-    return new Promise((resolve, reject) => {
+    if (package.pacotefull){
     
-        ConexaoBanco.query(sqlDocumentosExistentes, (error, results) => {
-            
-            if(error){
-                return reject(error);
-            }
-            else{
-                return resolve(results.rows);
-            }
+        const ConexaoBanco = Configuracao.conexao;    
+
+        return new Promise((resolve, reject) => {
+        
+            ConexaoBanco.query(sqlDocumentosExistentes, (error, results) => {
+                
+                if(error){
+                    return reject(error);
+                }
+                else{
+                    return resolve(results.rows);
+                }
+            });
         });
-    });
+    }
 };
