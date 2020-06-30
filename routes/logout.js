@@ -1,15 +1,23 @@
 const express = require("express");
 const router = express.Router();
+const logoutController = require('../controllers/logoutController');
+// const token = require("../controllers/jwtController");
 
-const usuarios = require('../controllers/painel/usuariosLoginController');
-const token = require("../controllers/jwtController");
+/* Exemplo de arquivos
+		{
+			"logout":{
+				"codEmpresa": 4,
+				"codVendedor": 2
+			}
+		}
+*/
 
-//Pesquisar usuários para efetuar logout
+// Pesquisar usuários para efetuar logout
 router.route('')
-	.post(token.validarTokenApp, usuarios.efetuarlogout);
+	.post(logoutController.efetuarlogout);
 
-router.route('/retaguarda')
-	.post(token.validarTokenRetaguarda, usuarios.efetuarlogout);
+// router.route('/retaguarda')
+// 	.post(token.validarTokenRetaguarda, usuarios.efetuarlogout);
 
 // retornando router
 module.exports = router;

@@ -1,3 +1,7 @@
+const crypto = require('crypto');
+const CryptoGcm = require('crypto-gcm');
+const global = require('../config/global');
+
 /* ( models/produtos - retornarProdutos é um exemplo de como utilizar )
     
     Adicione o funcUtils.js no seu arquivo.
@@ -191,4 +195,18 @@ exports.codigoAleatorio = function codigoAleatorio(){
     const codigoValido = JSON.stringify(senhaGerada[indAleatorio]);
 
     return codigoValido.slice(3, 7);
+}
+
+exports.criptografar = function criptografar(texto){
+
+    var emBase64 = new Buffer.from(texto).toString("base64")
+        
+    return emBase64;
+}
+
+exports.descriptografar = function descriptografar(texto){
+   
+    var deBase64 = new Buffer.from(texto, "base64").toString("ascii")
+
+    return deBase64;
 }
