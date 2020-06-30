@@ -218,7 +218,7 @@ exports.clienteDuplicado = function clienteDuplicado(cpf, cnpj){
 
     var sql, params;
 
-    if (cpf.length > 0){
+    if (!cnpj){
         sql = sqlClienteDuplicado;
         params = cpf;
     }else{
