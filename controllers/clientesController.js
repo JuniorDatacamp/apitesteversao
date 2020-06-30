@@ -241,11 +241,9 @@ exports.inserirApp = function(req, res){
         }); 
     }
 
-    console.log(objCliente.cli_tipopes, objCliente.cli_cpf, objCliente.cli_cgc);
-
     clientes.clienteDuplicado(objCliente.cli_cpf, objCliente.cli_cgc).then(
         (result) =>{
-            
+           
             clientes.insertApp(objCliente).then(
                 (resultados) => {
 

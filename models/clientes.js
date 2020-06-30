@@ -144,7 +144,10 @@ const updateClientesCompleto =
     `;
 
 const sqlClienteDuplicado =
-    ' select count(*) as qtde_registro from clientes where cli_cpf = $1 or cli_cgc = $2 '
+    ' select count(*) as qtde_registro from clientes where cli_cpf = $1 ';
+
+const sqlClienteDuplicadoCNPJ =
+    ' select count(*) as qtde_registro from clientes where cli_cgc = $1 ';
 
 const sqlDeleteCliente =
     `   WITH retorno AS 
@@ -194,7 +197,7 @@ function formatSqlSyncronizacaoApp (package){
                 end as cli_novo
         `;
     
-    var params = [];    
+    var params = [];
     var selectClientes = '';    
 
     params.push(package.codVendedor);
@@ -211,17 +214,24 @@ function formatSqlSyncronizacaoApp (package){
     return {sql: selectClientes, parametros: params};
 }
 
-exports.clienteDuplicado = function clienteDuplicado(cpf, cnpj){    
+exports.clienteDuplicado = function clienteDuplicado(cpf, cnpj){ 
+
+    var sql, params;
+
+    if (cpf.length > 0){
+        sql = sqlClienteDuplicado;
+        params = cpf;
+    }else{
+        sql = sqlClienteDuplicadoCNPJ;
+        params = cnpj;
+    }
     
     const ConexaoBanco = Configuracao.conexao;
-    const selectClienteDuplicado = sqlClienteDuplicado;
 
     return new Promise((resolve, reject) => {
     
         //Verificando se existe o cliente com cnpj ou cpf cadastrado na base de dados.
-        ConexaoBanco.query(selectClienteDuplicado, [
-            cpf, cnpj
-        ], (error, results) => {
+        ConexaoBanco.query(sql, [params], (error, results) => {
 
             if (results.rows[0].qtde_registro > 0){
                 return reject({clienteExistente: results.rows[0].qtde_registro});
