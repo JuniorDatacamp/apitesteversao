@@ -592,7 +592,7 @@ exports.delete = function (idCliente){
 
 exports.documentosExistentes = function (package){
 
-    if (package.pacotefull){
+    // if (package.pacotefull){
     
         const ConexaoBanco = Configuracao.conexao;    
 
@@ -608,5 +608,5 @@ exports.documentosExistentes = function (package){
                 }
             });
         });
-    }
+    // }
 };
