@@ -71,12 +71,12 @@ process.env.TZ = "America/Sao_Paulo";
 
 pg.types.setTypeParser(typesBD.NUMERIC, parseFloat);
 pg.types.setTypeParser(typesBD.INT8, parseInt);
-// pg.types.setTypeParser(typesBD.DATE, function(stringValue) {
-//     return new Date(Date.parse(stringValue))
-// });
-// pg.types.setTypeParser(typesBD.TIMESTAMP, function(stringValue) {
-//     return new Date(Date.parse(stringValue + "+0000"))
-// });
+pg.types.setTypeParser(typesBD.DATE, function(stringValue) {
+    return new Date(Date.parse(stringValue))
+});
+pg.types.setTypeParser(typesBD.TIMESTAMP, function(stringValue) {
+    return new Date(Date.parse(stringValue + "+0000"))
+});
 
 function createPool() {
 
