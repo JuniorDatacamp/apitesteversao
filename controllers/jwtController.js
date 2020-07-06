@@ -57,9 +57,25 @@ exports.getToken = function (res, oToken, modeloToken){
 exports.validarTokenApp = function(req, res, next){
     
     const criptToken = getTipoToken();
-    const objToken = {token: req.headers['x-access-token'], chaveCript: criptToken.app};
+    const objToken = {token: req.headers['x-access-token'], chaveCript: criptToken.app};    
 
-    validarUsuario(objToken, res, next);
+    // /* Recuperando se existe usuário com login na base de dados do painel de gerenciamento de licença. */
+
+    const hostname = process.env.HOST_PAINEL;
+    const path = '/painel/verificausuario/'+objToken.token;
+
+    requestServer.post(`${hostname}${path}`, (err, respServer, body) => {
+
+        if (err){
+            res.status(500).json({ mensagem: `Erro ao verificar usuário no painel de licença! [ ${err} ]` });
+        };
+
+        if (respServer.statusCode !== 200){   
+            res.status(401).json(JSON.parse(body));
+        }else{
+            validarUsuario(objToken, res, next);
+        }
+    });
 };
 
 exports.validarTokenRetaguarda = function(req, res, next){
@@ -84,27 +100,9 @@ function validarUsuario(oToken, res, next) {
             // - usamos o resultado do jwt.decode() para verificar se o token expirou.
             if (decoded.exp <= Date.now()) {
                 res.status(401).json({codigo: 401.001, mensagem: 'Acesso Expirado, faça login novamente'});
-            }
-
-            /* Recuperando se existe usuário com login na base de dados do painel de gerenciamento de licença. */
-
-            const hostname = process.env.HOST_PAINEL;
-            const path = '/painel/verificausuario/'+token;
-        
-            requestServer.post(`${hostname}${path}`, (err, respServer, body) => {
-     
-                if (err){
-                    res.status(500).json({ mensagem: `Erro ao verificar usuário no painel de licença! [ ${err} ]` });
-                }
-        
-                if (respServer.statusCode === 200){
-
-                    return next();
-        
-                }else{   
-                    res.status(401).json(JSON.parse(body));
-                }
-            });
+            }else{
+                return next();
+            }           
             
         // - Caso aconteça algum erro
         } catch (err) {
