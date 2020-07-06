@@ -59,8 +59,7 @@ exports.login = function (req, res) {
             const tipoTokenGerar = jwt.getTipoToken();
             const ResultToken = jwt.gerarToken(365, resultados[0].vdd_id, tipoTokenGerar.app);
 
-            // const hostname = process.env.HOST_PAINEL;
-            const hostname = 'http://api.datacamp.net.br';
+            const hostname = process.env.HOST_PAINEL;
             const path = '/painel/atualizartoken/';
 
             requestServer.post(`${hostname}${path}`, {

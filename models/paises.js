@@ -50,10 +50,8 @@ exports.insert = function insert(ObjPaises){
 
         var sql = format(insertPaises, paramsPais);
        
-        ConexaoBanco.query(sql, (error, results) => {
-            
-            ConexaoBanco.end();
-            
+        ConexaoBanco.query(sql, (error, results) => {            
+           
             if (error){
                 console.log('Erro ao inserir países. '+ error);
                 return reject(error);

@@ -1,7 +1,7 @@
 const format = require('pg-format');
 const Configuracao = require('../config/database');
 const sqlDepartamentos = 
-    'select dep_id, dep_descricao, dep_desconto, dep_coeficiente, dep_situacao from departamento ';
+    'select dep_id, dep_descricao, dep_desconto, dep_coeficiente, dep_situacao, dep_acesso_api from departamento ';
 
 const sqlOrderby =
     ' order by dep_id ';
@@ -29,7 +29,7 @@ exports.retornarDepartamentos = function retornarDepartamentos(package){
     //utilizar na sync e syncFull
     return new Promise((resolve, reject) => {
 
-        const ConexaoBanco = Configuracao.conexao;
+        const ConexaoBanco = Configuracao.conexao;        
         var params = [];
 
         if (package.pacotefull){
