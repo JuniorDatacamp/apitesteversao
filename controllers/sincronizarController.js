@@ -1,4 +1,5 @@
 const format = require('pg-format');
+const moment = require('moment');
 const sincronizar = require('../models/sincronizar');
 const jwt = require('../controllers/jwtController');
 const vendedores = require('../models/vendedores');
@@ -12,6 +13,7 @@ const empresas = require('../models/empresa');
 const vendas = require('../models/vendas');
 const ocorrencias = require('../models/ocorrencias');
 const ultMovRetaguarda = require('../models/ultMovRetaguarda');
+const { string } = require('pg-format');
 
 exports.sincronizandoApp = function(req, res, isFull){
 
@@ -35,9 +37,9 @@ exports.sincronizandoApp = function(req, res, isFull){
 
             //Verificando se data de atualização é maior, é necessário ficar aqui a validação pois
             //pelo sql sempre iria trazer alterações de configurações na sync.
-            const dtAtualizacaoApp = new Date(packageSync.data);
-            
-            if (config.par_dt_ultima_atualizacao > dtAtualizacaoApp){
+            const dtAtualizacaoApp = moment(packageSync.data, "YYYY-MM-DD[T]HH:mm:ss").utc(true).toDate();            
+
+            if (moment(string(config.par_dt_ultima_atualizacao)).isAfter(dtAtualizacaoApp) || (packageSync.pacotefull)) {
                 jsonConfiguracao = config
             }
             else{
