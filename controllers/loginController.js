@@ -30,86 +30,104 @@ const empresas = require('../models/empresa');
 
 exports.login = function (req, res) {
 
-  const codVendedor = req.body.login.codVendedor;
-  const codEmpresa = req.body.login.codEmpresa;
-  const dadosLogin = req.body.login;
+    const codVendedor = req.body.login.codVendedor;
+    const codEmpresa = req.body.login.codEmpresa;
+    const dadosLogin = req.body.login;
 
-  const objFullPackage = {
-    codVendedor : codVendedor,
-    pacotefull: true,
-    data: req.params.ultimasincronizacao
-  };
+    var objFullPackage = {
+        codVendedor : codVendedor,
+        pacotefull: true,
+        data: req.params.ultimasincronizacao,
+        vinculoClientesVendedor: 'S'
+    };
 
-  Promise.all([
-    vendedores.loginVendedor(dadosLogin),
-    departamentos.retornarDepartamentos(objFullPackage),
-    clientes.retornarClientesApp(objFullPackage),
-    tiposPagtos.retornarTipoPagtos(objFullPackage),
-    municipios.retornarMunicipiosApp(objFullPackage),
-    produtos.retornarProdutosApp(objFullPackage),
-    configuracoes.retornarConfiguracoesApp(objFullPackage),
-    empresas.retornarEmpresaApp(objFullPackage),
-    clientes.documentosExistentes(objFullPackage)
-  ])
-    // na função THEN recuperamos o resultado de cada uma em um array. 
-    // os valores sao retornados na ordem em que foram chamados
+    vendedores.loginVendedor(dadosLogin)
     .then(
-        (resultados) => {
+        (login) => {
 
-            const tipoTokenGerar = jwt.getTipoToken();
-            const ResultToken = jwt.gerarToken(365, resultados[0].vdd_id, tipoTokenGerar.app);
+            configuracoes.retornarConfiguracoesApp(objFullPackage)
+            .then(
+                config => {
 
-            const hostname = process.env.HOST_PAINEL;
-            const path = '/painel/atualizartoken/';
+                    objFullPackage.vinculoClientesVendedor = (config.par_vinculo_clientes_vendedor === 'S') ? true : false;
 
-            requestServer.post(`${hostname}${path}`, {
-                json: {
-                    "email": resultados[0].vdd_email,
-                    "token": ResultToken
+                    Promise.all([
+                        departamentos.retornarDepartamentos(objFullPackage),
+                        clientes.retornarClientesApp(objFullPackage),
+                        tiposPagtos.retornarTipoPagtos(objFullPackage),
+                        municipios.retornarMunicipiosApp(objFullPackage),
+                        produtos.retornarProdutosApp(objFullPackage),
+                        empresas.retornarEmpresaApp(objFullPackage),
+                        clientes.documentosExistentes(objFullPackage)
+                    ])
+                    .then(
+                        (resultados) => {
+
+                            const tipoTokenGerar = jwt.getTipoToken();
+                            const ResultToken = jwt.gerarToken(365, login.vdd_id, tipoTokenGerar.app);
+
+                            const hostname = process.env.HOST_PAINEL;
+                            const path = '/painel/atualizartoken/';
+
+                            requestServer.post(`${hostname}${path}`, {
+                                json: {
+                                    "email": login.vdd_email,
+                                    "token": ResultToken
+                                }
+                            },
+                                (err, respServer, body) => {                
+
+                                if (err){
+                                    res.status(500).json({ mensagem: `Erro ao atualizar token do usuário! [ ${err} ]` });
+                                }
+
+                                if (respServer.statusCode === 200){
+                                    
+                                    console.log('Token atualizado com sucesso! Tudo pronto para o login ... ');
+
+                                    res.status(200).json({
+                                        vendedor: login,
+                                        departamentos: resultados[0],
+                                        clientes: resultados[1],
+                                        tiposPagtos: resultados[2],
+                                        municipios: resultados[3],
+                                        produtos: resultados[4],
+                                        configuracao: config,
+                                        empresa: resultados[5],
+                                        doctosClientes: resultados[6],
+                        
+                                        token: ResultToken
+                                    });
+
+                                }else{  
+                                    console.log(body);                  
+                                    res.status(401).json(body);
+                                }
+                            }); 
+                        },
+                        (erro) => {
+                            res.status(500).json({mensagem: `Erro ao efetuar login! [ ${erro} ]` });
+                        }
+                    );
+                },
+                errorConfig => {
+                    res.status(500).json({mensagem: `Erro ao efetuar login! [ ${errorConfig} ]` });
                 }
-            },
-                (err, respServer, body) => {                
-
-                if (err){
-                    res.status(500).json({ mensagem: `Erro ao atualizar token do usuário! [ ${err} ]` });
-                }
-
-                if (respServer.statusCode === 200){
-                    
-                    console.log('Token atualizado com sucesso! Tudo pronto para o login ... ');
-
-                    res.status(200).json({
-                        vendedor: resultados[0],
-                        departamentos: resultados[1],
-                        clientes: resultados[2],
-                        tiposPagtos: resultados[3],
-                        municipios: resultados[4],
-                        produtos: resultados[5],
-                        configuracao: resultados[6],
-                        empresa: resultados[7],
-                        doctosClientes: resultados[8],
-        
-                        token: ResultToken
-                    });
-
-                }else{  
-                    console.log(body);                  
-                    res.status(401).json(body);
-                }
-            }); 
+            );
         },
         (erro) => {
 
             switch (erro) {
                 case 401.007:
-                    res.status(401).json({status: erro, mensagem: "Vendedor não encontrado."});                    
+                    res.status(401).json({status: erro, mensagem: "Vendedor não encontrado."});
                     break;
                 default:
                     res.status(500).json({mensagem: `Erro ao efetuar login! [ ${erro} ]` });
                     break;
-            }            
+            }
+
         }
-    );
+    )
 };
 
 exports.loginRetaguarda = function (request, response) {

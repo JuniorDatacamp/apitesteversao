@@ -7,7 +7,8 @@ const SqlConfiguracao =
     	    par_palm_bloq_sem_estoque, par_palm_fabricante, par_palm_campos_obrig,
     	    par_palm_multiplo, par_palm_controle_saldo_cli, par_palm_bloq_cli_pf,
             par_palm_bloq_pedido_pf, par_integracao_pda, par_orc_outras, par_orc_dias_maximo_dt_entrega,
-            par_venda_inicio, par_palm_preco, par_altera_vlr_unit_app
+            par_venda_inicio, par_palm_preco, par_altera_vlr_unit_app, par_vinculo_clientes_vendedor,
+            par_dt_ultima_atualizacao
        from
     	    params `;
 
@@ -17,7 +18,7 @@ const insertConfiguracoes =
         par_palm_bloq_sem_estoque, par_palm_fabricante, par_palm_campos_obrig,
         par_palm_multiplo, par_palm_controle_saldo_cli, par_palm_bloq_cli_pf,
         par_palm_bloq_pedido_pf, par_integracao_pda, par_orc_outras, par_orc_dias_maximo_dt_entrega,
-        par_venda_inicio, par_palm_preco, par_altera_vlr_unit_app)
+        par_venda_inicio, par_palm_preco, par_altera_vlr_unit_app, par_vinculo_clientes_vendedor)
     values
         %L `;
 
@@ -27,7 +28,7 @@ const updateConfiguracoes =
             par_palm_campos_obrig = $7, par_palm_multiplo = $8, par_palm_controle_saldo_cli = $9, 
             par_palm_bloq_cli_pf = $10, par_palm_bloq_pedido_pf = $11, par_integracao_pda = $12, 
             par_orc_outras = $13, par_orc_dias_maximo_dt_entrega = $14, par_venda_inicio = $15,
-            par_palm_preco = $16, par_altera_vlr_unit_app = $17,
+            par_palm_preco = $16, par_altera_vlr_unit_app = $17, par_vinculo_clientes_vendedor = $18,
             par_dt_ultima_atualizacao = now() AT TIME ZONE 'America/Sao_Paulo'
         where
             par_id = $1 `;
@@ -39,19 +40,10 @@ exports.retornarConfiguracoesApp = function retornarConfiguracoesApp(package){
     return new Promise((resolve, reject) => {
 
         const ConexaoBanco = Configuracao.conexao;
-
-        var params = [];
-
-        if (package.pacotefull){
-            var addWhere = ' ';
-        }else{
-            var addWhere = ' where par_dt_ultima_atualizacao > $1 ';
-            params.push(package.data);            
-        }             
-  
+ 
         console.log('Consultando configurações...');
-        ConexaoBanco.query(SqlConfiguracao+addWhere, params, (error, resultsConfiguracao) => {
-            
+        ConexaoBanco.query(SqlConfiguracao, (error, resultsConfiguracao) => {
+           
             if (error){
                 return reject('Erro ao consultar configurações no banco de dados.');
             }else{              
@@ -98,7 +90,8 @@ exports.insert = function insert(ObjConfiguracoes){
                 configuracoes.par_palm_multiplo, configuracoes.par_palm_controle_saldo_cli, 
                 configuracoes.par_palm_bloq_cli_pf, configuracoes.par_palm_bloq_pedido_pf,
                 configuracoes.par_integracao_pda, configuracoes.par_orc_outras, configuracoes.par_orc_dias_maximo_dt_entrega,
-                configuracoes.par_venda_inicio, configuracoes.par_palm_preco, configuracoes.par_altera_vlr_unit_app
+                configuracoes.par_venda_inicio, configuracoes.par_palm_preco, configuracoes.par_altera_vlr_unit_app,
+                configuracoes.par_vinculo_clientes_vendedor
             ]);
         });       
 
@@ -139,7 +132,7 @@ exports.update = function update(ObjConfiguracoes){
                     element.par_palm_campos_obrig, element.par_palm_multiplo, element.par_palm_controle_saldo_cli,
                     element.par_palm_bloq_cli_pf, element.par_palm_bloq_pedido_pf, element.par_integracao_pda,
                     element.par_orc_outras, element.par_orc_dias_maximo_dt_entrega, element.par_venda_inicio,
-                    element.par_palm_preco, element.par_altera_vlr_unit_app
+                    element.par_palm_preco, element.par_altera_vlr_unit_app, element.par_vinculo_clientes_vendedor
                 ], (error, results) => {
 
                     if (error){

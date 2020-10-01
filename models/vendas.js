@@ -28,19 +28,36 @@ const sqlVendasApp =
                 from
             venda v) x
         where
-            x.r <= 10 and vdd_id = $1  `;
+            x.r <= 10 and (cast(vdd_id as varchar(10)) ilike $1)  `;
+
+const sqlVendaDuplicada =
+    `   select
+            ven_uuid, cli_id, cli_uuid, ped_id, vdd_id, tpg_id, ven_data,
+            ven_total, ven_tipo, ven_situacao, ven_observacao, 
+            ven_tipo_venda, ven_urgente, ven_dt_entrega,
+            case
+                when ven_id isnull then 'N'
+            else 'S'
+            end as recebimento,
+            'S' as enviado,
+            ven_cod_verificador,
+            (select json_agg(ValorJson) from vw_agruparitemvendaJSON where ven_uuid = v.ven_uuid group by ven_uuid) as itemvendas           
+        from 
+            venda v
+        where
+            ven_cod_verificador = $1 `;
 
 const textQueryInsertApp =
     "   INSERT INTO venda(  "+
     "       cli_uuid, cli_id, vdd_id, tpg_id, ven_data,   "+
     "       ven_total, ven_observacao, ven_tipo, ven_tipo_venda, ven_urgente,  "+
-    "       ven_dt_entrega, ven_desconto, ven_situacao "+
+    "       ven_dt_entrega, ven_desconto, ven_situacao, ven_cod_verificador "+
     "   )       "+
     "   VALUES      "+
     "   (       "+ 
     "       $1, $2, $3, $4, $5, "+
     "       $6, $7, $8, $9, $10, "+
-    "       $11, $12, $13  "+
+    "       $11, $12, $13, $14  "+
     "   ) RETURNING ven_uuid, ped_id; "
 
 const sqlVendas =
@@ -92,13 +109,38 @@ exports.getVendasApp = function(package){
     return new Promise((resolve, reject) => {        
 
         const ConexaoBanco = Configuracao.conexao;
+        var params;
 
-        console.log('Consultando vendas...');        
-        ConexaoBanco.query(sqlVendasApp+sqlOrderby, [package.codVendedor], (error, results) => {
+        (package.vinculoClientesVendedor) ? params = package.codVendedor : params = '%';
+
+        console.log('Consultando vendas...');
+        ConexaoBanco.query(sqlVendasApp+sqlOrderby, [params], (error, results) => {
         
             if (error){
+                console.log('Erro ao consultar vendas app...');
                 return reject(error);
             }else{  
+                const venda = results.rows;
+                return resolve(venda);
+            }
+        });
+    });
+};
+
+exports.getVendaDuplicadasApp = function(ven_cod_verificador){
+    
+    return new Promise((resolve, reject) => {        
+
+        const ConexaoBanco = Configuracao.conexao;
+
+        console.log('Consultando venda duplicada...');
+        ConexaoBanco.query(sqlVendaDuplicada, [ven_cod_verificador], (error, results) => {
+        
+            if (error){
+                console.log('Erro ao consultar venda duplicada...');
+                return reject('Erro ao consultar venda duplicada...'+error);
+            }else{ 
+                console.log('Venda duplicada retornada com sucesso...'); 
                 const venda = results.rows;
                 return resolve(venda);
             }
@@ -117,13 +159,15 @@ exports.insertApp = function insertApp(ObjVendas){
         ConexaoBanco.query(textQueryInsertApp, [
             aVenda.cli_uuid, aVenda.cli_id, aVenda.vdd_id, aVenda.tpg_id, 
             aVenda.ven_data, aVenda.ven_total, aVenda.ven_observacao, aVenda.ven_tipo, aVenda.ven_tipo_venda, 
-            aVenda.ven_urgente, aVenda.ven_dt_entrega, aVenda.ven_desconto, 'P'
+            aVenda.ven_urgente, aVenda.ven_dt_entrega, aVenda.ven_desconto, 'P', aVenda.ven_cod_verificador
         ], (error, results) => {
 
             if (error){
-                console.log(error);
-                resultVenda = {mensagem: "Erro ao gravar a venda.", error: error};
-                return reject(resultVenda);
+                console.log('Erro ao gravar Venda.', error);
+
+                const erroVenda = [error, aVenda];
+                
+                return reject(erroVenda);
             }
             else{
                 resultVenda         = {ven_uuid: results.rows[0].ven_uuid, ped_id: results.rows[0].ped_id};                    

@@ -25,19 +25,13 @@ const sqlClienteApp =
         end as corlegenda
         %s
     from
-        CLIENTES c
-    left join	
-        TIPOS_PAGTOS_CLIENTE P ON C.CLI_UUID = P.CLI_UUID
-    left join
-        VENDA V ON C.CLI_UUID = V.CLI_UUID
-    left join	
-        RECEBER b ON C.CLI_UUID = B.CLI_UUID	        
+        CLIENTES c	        
     left join
         RESTRICOES r on c.res_id = r.RES_ID
     left join
         ESPECIALIDADE e on c.ESP_ID = e.ESP_ID  
     where
-        c.vdd_id = $1  `;
+        (cast(c.vdd_id as varchar(10)) ilike $1) `;
 
 const insertClientesCompleto =
     `   INSERT INTO clientes(
@@ -198,16 +192,21 @@ function formatSqlSyncronizacaoApp (package){
         `;
     
     var params = [];
-    var selectClientes = '';    
+    var selectClientes = '';
 
-    params.push(package.codVendedor);
+    (package.vinculoClientesVendedor) ? params.push(package.codVendedor) : params.push('%');
 
-    if (package.pacotefull){
-        selectClientes  = format(sqlClienteApp, '') + ` and cli_ativo = 'A' ` + sqlGroupBy;        
+    if (package.pacotefull){        
+        selectClientes  = format(sqlClienteApp, '') + ` and cli_ativo = 'A' `;
     }else{
         const addColunaCliente  = format(colunaClienteNovo, package.data);
-        selectClientes          = format(sqlClienteApp, addColunaCliente) + ` and cli_dt_ultima_atualizacao > $2 or 
-                                    tpc_dt_ultima_atualizacao > $2 or rec_dt_ultima_atualizacao > $2 or ven_dt_ultima_atualizacao > $2 ` + sqlGroupBy;
+        
+        selectClientes          = format(sqlClienteApp, addColunaCliente) + `
+            and cli_uuid in (
+                select cli_uuid from vw_atualizacao_clientes where dt_ultima_atualizacao > $2 group by cli_uuid
+            )  or (cli_dt_ultima_atualizacao > $2 )
+        `;
+
         params.push(package.data);
     };
 
@@ -246,8 +245,8 @@ exports.retornarClientesApp = function retornarClientesApp(package){
     
     const ret            = formatSqlSyncronizacaoApp(package);
     const sqlClientes    = ret.sql;
-    const paramsClientes = ret.parametros;  
-    
+    const paramsClientes = ret.parametros;
+   
     return new Promise((resolve, reject) => {
 
         const ConexaoBanco = Configuracao.conexao;
@@ -255,7 +254,7 @@ exports.retornarClientesApp = function retornarClientesApp(package){
 
         console.log('Consultando clientes...');
         ConexaoBanco.query(sqlClientes+sqlOrderby, paramsClientes, (error, resultsClientes) => {
-
+           
             if (error){
                 return reject('Erro ao consultar cliente no banco de dados. ' + error);
             };
@@ -277,7 +276,7 @@ exports.retornarClientesApp = function retornarClientesApp(package){
                     var recebers = resultados[0];
                     var vendas = resultados[1];
                     var tiposPagtosCliente = resultados[2];
-                
+               
                     clientes.forEach(function (iClientes, indice, arrayClientes) {
 
                         if ((iClientes.res_situacao == 'N') && (iClientes.res_bloq_debitos == 'S')){
@@ -592,7 +591,7 @@ exports.delete = function (idCliente){
 
 exports.documentosExistentes = function (package){
 
-    if (package.pacotefull){
+    if (package.pacotefull & package.vinculoClientesVendedor) {
     
         const ConexaoBanco = Configuracao.conexao;    
 

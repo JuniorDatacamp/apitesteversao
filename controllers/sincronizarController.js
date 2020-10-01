@@ -21,43 +21,67 @@ exports.sincronizandoApp = function(req, res, isFull){
     const packageSync = {
         codVendedor : (jwt.getToken(res, token, tipoToken.app).iss),
         pacotefull : isFull,
-        data : req.params.ultimasincronizacao
+        data : req.params.ultimasincronizacao,
+        vinculoClientesVendedor: 'S'
     };
 
     console.log('Sincronizando Aplicativo: Full: ' + packageSync.pacotefull);
 
-    Promise.all([
-        vendedores.retornarVendedorApp(packageSync),
-        departamentos.retornarDepartamentos(packageSync),
-        clientes.retornarClientesApp(packageSync),
-        tiposPagtos.retornarTipoPagtos(packageSync),
-        municipios.retornarMunicipiosApp(packageSync),
-        produtos.retornarProdutosApp(packageSync),
-        configuracoes.retornarConfiguracoesApp(packageSync),
-        empresas.retornarEmpresaApp(packageSync),
-        ocorrencias.retornarOcorrencias(packageSync),
-        clientes.documentosExistentes(packageSync)
-    ])
+    configuracoes.retornarConfiguracoesApp(packageSync)
     .then(
-        (resultados) => {
+        config => {
 
-            res.status(200).json({
-                vendedor: resultados[0],
-                departamentos: resultados[1],
-                clientes: resultados[2],
-                tiposPagtos: resultados[3],
-                municipios:  resultados[4],
-                produtos:  resultados[5],
-                configuracao:  resultados[6],
-                empresa:  resultados[7],
-                ocorrencias: resultados[8].ocorrencias,
-                doctosClientes: resultados[9]
-            });
+            var jsonConfiguracao;
+
+            //Verificando se data de atualização é maior, é necessário ficar aqui a validação pois
+            //pelo sql sempre iria trazer alterações de configurações na sync.
+            const dtAtualizacaoApp = new Date(packageSync.data);
+            
+            if (config.par_dt_ultima_atualizacao > dtAtualizacaoApp){
+                jsonConfiguracao = config
+            }
+            else{
+                jsonConfiguracao = [];
+            }
+
+            packageSync.vinculoClientesVendedor = (config.par_vinculo_clientes_vendedor === 'S') ? true : false;
+
+            Promise.all([
+                vendedores.retornarVendedorApp(packageSync),
+                departamentos.retornarDepartamentos(packageSync),
+                clientes.retornarClientesApp(packageSync),
+                tiposPagtos.retornarTipoPagtos(packageSync),
+                municipios.retornarMunicipiosApp(packageSync),
+                produtos.retornarProdutosApp(packageSync),
+                empresas.retornarEmpresaApp(packageSync),
+                ocorrencias.retornarOcorrencias(packageSync),
+                clientes.documentosExistentes(packageSync)
+            ])
+            .then(
+                (resultados) => {
+        
+                    res.status(200).json({
+                        vendedor: resultados[0],
+                        departamentos: resultados[1],
+                        clientes: resultados[2],
+                        tiposPagtos: resultados[3],
+                        municipios:  resultados[4],
+                        produtos:  resultados[5],
+                        configuracao:  jsonConfiguracao,
+                        empresa:  resultados[6],
+                        ocorrencias: resultados[7].ocorrencias,
+                        doctosClientes: resultados[8]
+                    });
+                },
+                (erro) => {
+                    res.status(500).json({mensagem: `Erro no sincronizar!! [ ${erro} ]`});
+                }
+            );        
         },
-        (erro) => {
-            res.status(500).json({mensagem: `Erro no sincronizar!! [ ${erro} ]`});
+        errorConfig => {
+            res.status(500).json({mensagem: `Erro no sincronizar!! [ ${errorConfig} ]` });
         }
-    );    
+    ) 
 };
 
 exports.sincronizandoRetaguarda = function(req, res){

@@ -4,12 +4,15 @@ const token = require("../controllers/jwtController");
 
 const movRetaguarda = require('../controllers/ultMovRetaguardaController');
 const clientes = require('../controllers/clientesController');
+const consultaEstoques = require('../controllers/consultaEstoqueController');
 const departamentos = require('../controllers/departamentosController');
 const itemVendas = require('../controllers/itemVendasController');
 const itemPromocoes = require('../controllers/itemPromocoesController');
 const marcas = require('../controllers/marcasController');
 const municipios = require('../controllers/municipiosController');
 const paises = require('../controllers/paisesController');
+const filiais = require('../controllers/filiaisController');
+const estoqueFiliais = require('../controllers/estoqueFiliaisController');
 const produtos = require('../controllers/produtosController');
 const promocoes = require('../controllers/promocoesController');
 const recebers = require('../controllers/recebersController');
@@ -80,6 +83,15 @@ router.route('/clientes/:pesquisa')
 
 //Fim Clientes
 
+//Consultar Estoques Produtos com Filiais
+router.route('/consultaEstoques/')
+		.get(token.validarTokenRetaguarda, consultaEstoques.pesquisar);
+
+router.route('/consultaEstoques/:pesquisa')
+		.get(token.validarTokenRetaguarda, consultaEstoques.pesquisar);
+
+//Fim Consultar Estoques Produtos com Filiais
+
 /******Departamentos******/
 router.route('/departamentos/')
 		.post(token.validarTokenRetaguarda, departamentos.inserir)
@@ -132,18 +144,34 @@ router.route('/municipios')
 
 router.route('/municipios/:pesquisa')
 		.get(token.validarTokenRetaguarda, municipios.pesquisarTodos)
-
 //Fim Municipios
 
-/******Paises******/
 
+/******Paises******/
 router.route('/paises/')
 		.post(token.validarTokenRetaguarda, paises.inserir)
 		.get(token.validarTokenRetaguarda, paises.pesquisarTodos)
 		.put(token.validarTokenRetaguarda, paises.alterar)
 		.delete(token.validarTokenRetaguarda, paises.deletar)
+//Fim Paises	
 
-//Fim Paises		
+
+/******Filiais******/
+router.route('/filiais/')
+		.post(token.validarTokenRetaguarda, filiais.inserir)
+		.get(token.validarTokenRetaguarda, filiais.pesquisarTodos)
+		.put(token.validarTokenRetaguarda, filiais.alterar)
+		.delete(token.validarTokenRetaguarda, filiais.deletar)
+//Fim Filiais
+
+/******estoqueFiliais******/
+router.route('/estoqueFiliais/')
+		.post(token.validarTokenRetaguarda, estoqueFiliais.inserir)
+		.get(token.validarTokenRetaguarda, estoqueFiliais.pesquisarTodos)
+		.put(token.validarTokenRetaguarda, estoqueFiliais.alterar)
+router.route('/estoqueFiliais/:filID')		
+		.delete(token.validarTokenRetaguarda, estoqueFiliais.deletar)
+//Fim estoqueFiliais
 
 /******Produtos******/
 router.route('/produtos/app')

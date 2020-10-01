@@ -14,7 +14,7 @@ const sqlPagtosJoinCliente =
         inner join 
             clientes c on t.cli_uuid = c.cli_uuid
         where
-            vdd_id = $1  `;
+            (cast(vdd_id as varchar(10)) ilike $1)  `;
 
 const sqlOrderby =
     ' order by tpc_id ';
@@ -42,9 +42,12 @@ exports.getTiposPagtosClienteApp = function(package){
     return new Promise((resolve, reject) => {
 
         const ConexaoBanco = Configuracao.conexao;
+        var params;
+
+        (package.vinculoClientesVendedor) ? params = package.codVendedor : params = '%';        
 
         console.log('Consultando tipos pagamentos cliente...');        
-        ConexaoBanco.query(sqlPagtosJoinCliente+sqlOrderby, [package.codVendedor], function(error, results){
+        ConexaoBanco.query(sqlPagtosJoinCliente+sqlOrderby, [params], function(error, results){
             if(error){
                 return reject(error);
             }

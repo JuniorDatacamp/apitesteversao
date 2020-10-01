@@ -11,7 +11,7 @@ const sqlReceberApp =
         inner join 
             clientes c on r.cli_uuid = c.cli_uuid    
         where 
-            valorareceber > 0 and c.vdd_id = $1
+            valorareceber > 0 and (cast(c.vdd_id as varchar(10)) ilike $1)
     `;
 
 const sqlReceber =
@@ -75,9 +75,12 @@ exports.getReceberApp = function(package){
     return new Promise((resolve, reject) => {        
 
         const ConexaoBanco = Configuracao.conexao;
+        var params;
+
+        (package.vinculoClientesVendedor) ? params = package.codVendedor : params = '%';
 
         console.log('Consultando receber...');        
-        ConexaoBanco.query(sqlReceberApp+sqlOrderby, [package.codVendedor], function(error, results){
+        ConexaoBanco.query(sqlReceberApp+sqlOrderby, [params], function(error, results){
             if(error){
                 return reject(error);
             }

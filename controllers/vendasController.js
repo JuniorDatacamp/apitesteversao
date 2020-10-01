@@ -63,7 +63,8 @@ class venda {
         this.ven_custo_bancario      = body.ven_custo_bancario,
         this.reg_id                  = body.reg_id, 
         this.ven_cf_acertado         = body.ven_cf_acertado,
-        this.itemvendas             = body.itemvendas
+        this.itemvendas              = body.itemvendas,
+        this.ven_cod_verificador     = body.ven_cod_verificador
     }
 }
 
@@ -116,8 +117,23 @@ exports.inserirApp = function(req, res){
             });
         },
         (erro) => {
-            console.log(erro);
-            funcUtils.getMensagemErros(erro, res);
+
+            //Tratamento se existir duplicidade de venda do app, retonar a venda para o aplicativo atualizar seus dados.
+            if ((erro[0].code == 23505) && (erro[0].constraint === 'unique_ven_cod_verificador')){                              
+
+                Promise.resolve(vendasModel.getVendaDuplicadasApp(erro[1].ven_cod_verificador))
+                .then(
+                    (resultados) => {
+                        res.status(409).json(resultados[0]);
+                    },
+                    (rejeitado) => {
+                        res.status(500).json(rejeitado);
+                    }
+                );
+
+            }else{
+                funcUtils.getMensagemErros(erro, res);
+            };            
         }
     );
 };
