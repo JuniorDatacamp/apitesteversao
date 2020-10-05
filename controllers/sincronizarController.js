@@ -41,10 +41,7 @@ exports.sincronizandoApp = function(req, res, isFull){
 
             if (moment(string(config.par_dt_ultima_atualizacao)).isAfter(dtAtualizacaoApp) || (packageSync.pacotefull)) {
                 jsonConfiguracao = config
-            }
-            else{
-                jsonConfiguracao = [];
-            }
+            };
 
             packageSync.vinculoClientesVendedor = (config.par_vinculo_clientes_vendedor === 'S') ? true : false;
 
