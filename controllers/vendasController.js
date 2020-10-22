@@ -103,6 +103,10 @@ exports.inserirApp = function(req, res){
         });
     }
 
+    console.log(objVenda);
+
+    console.log('chegando aqui: ', req.body.vendas);
+
     Promise.all([
         vendasModel.insertApp(objVenda)
     ])
