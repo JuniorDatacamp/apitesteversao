@@ -11,7 +11,10 @@ const insertTiposPedido =
         %L `;
 
 const deleteTiposPedido =
-    ` delete from tipos_pedido where tpp_id in (%s) `; 
+    `   WITH retorno AS 
+            (DELETE FROM tipos_pedido WHERE tpp_id in (%s) RETURNING tpp_id, 'tiposPedido', now() AT TIME ZONE 'America/Sao_Paulo')
+        INSERT INTO 
+            ocorrencias (oco_id_tabela, oco_tabela, oco_dt_ultima_atualizacao) SELECT * FROM retorno; `;
 
 const updateTiposPedido = 
     `   update tipos_pedido set

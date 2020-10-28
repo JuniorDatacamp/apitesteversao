@@ -9,7 +9,7 @@ const sqlOcorrencias =
 function formatarOcorrencias(array){
     
     var clientes, configuracoes, departamentos, municipios, produtos, recebers,
-    tiposdoctos, tipospagtos, tipospagtoscliente, vendedores;
+    tiposdoctos, tipospagtos, tipospagtoscliente, tiposPedido, vendedores;
 
     //Se existe ocorrencia(delete ou algo especial) para enviar para aplicativo.
     for (i in array){
@@ -53,6 +53,10 @@ function formatarOcorrencias(array){
             case 'tipospagtoscliente':
                 tipospagtoscliente = dados.tipospagtoscliente;
                 break;
+            
+            case 'tiposPedido':
+                tiposPedido = dados.tiposPedido;
+                break;                
 
             case 'vendedores':
                 vendedores = dados.vendedores;
@@ -66,7 +70,7 @@ function formatarOcorrencias(array){
     return {
         ocorrencias: {
             clientes, configuracoes, departamentos, municipios, produtos, recebers,
-            tiposdoctos, tipospagtos, tipospagtoscliente, vendedores
+            tiposdoctos, tipospagtos, tipospagtoscliente, tiposPedido, vendedores
         }
     }
 };
