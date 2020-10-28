@@ -38,6 +38,7 @@ const sqlVendaDuplicada =
             ven_uuid, cli_id, cli_uuid, ped_id, vdd_id, tpg_id, ven_data,
             ven_total, ven_tipo, ven_situacao, ven_observacao, 
             ven_tipo_venda, ven_urgente, ven_dt_entrega,
+            v.tpp_id, tpp_nome,
             case
                 when ven_id isnull then 'N'
             else 'S'
@@ -47,6 +48,8 @@ const sqlVendaDuplicada =
             (select json_agg(ValorJson) from vw_agruparitemvendaJSON where ven_uuid = v.ven_uuid group by ven_uuid) as itemvendas           
         from 
             venda v
+        left join
+            tipos_pedido t on v.tpp_id = t.tpp_id    
         where
             ven_cod_verificador = $1 `;
 
@@ -54,13 +57,13 @@ const textQueryInsertApp =
     "   INSERT INTO venda(  "+
     "       cli_uuid, cli_id, vdd_id, tpg_id, ven_data,   "+
     "       ven_total, ven_observacao, ven_tipo, ven_tipo_venda, ven_urgente,  "+
-    "       ven_dt_entrega, ven_desconto, ven_situacao, ven_cod_verificador "+
+    "       ven_dt_entrega, ven_desconto, ven_situacao, ven_cod_verificador, tpp_id "+
     "   )       "+
     "   VALUES      "+
     "   (       "+ 
     "       $1, $2, $3, $4, $5, "+
     "       $6, $7, $8, $9, $10, "+
-    "       $11, $12, $13, $14  "+
+    "       $11, $12, $13, $14, $15  "+
     "   ) RETURNING ven_uuid, ped_id; "
 
 const sqlVendas =
@@ -165,7 +168,8 @@ exports.insertApp = function insertApp(ObjVendas){
         ConexaoBanco.query(textQueryInsertApp, [
             aVenda.cli_uuid, aVenda.cli_id, aVenda.vdd_id, aVenda.tpg_id, 
             aVenda.ven_data, aVenda.ven_total, aVenda.ven_observacao, aVenda.ven_tipo, aVenda.ven_tipo_venda, 
-            aVenda.ven_urgente, aVenda.ven_dt_entrega, aVenda.ven_desconto, 'P', aVenda.ven_cod_verificador
+            aVenda.ven_urgente, aVenda.ven_dt_entrega, aVenda.ven_desconto, 'P', aVenda.ven_cod_verificador,
+            aVenda.tpp_id
         ], (error, results) => {
 
             if (error){
