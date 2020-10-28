@@ -21,6 +21,7 @@ const regioes = require('../controllers/regioesController');
 const tipoDoctos = require('../controllers/tipoDoctosController');
 const tipoPagtos = require('../controllers/tipoPagtosController');
 const tiposPagtosClientes = require('../controllers/tiposPagtosClientesController');
+const tiposPedidos = require('../controllers/tiposPedidoController');
 const vendas = require('../controllers/vendasController');
 const vendedores = require('../controllers/vendedoresController');
 const sincronizar = require('../controllers/sincronizarController');
@@ -254,6 +255,18 @@ router.route('/tipospagtoscliente')
 		.get(token.validarTokenRetaguarda, tiposPagtosClientes.pesquisarTodos)
 		.put(token.validarTokenRetaguarda, tiposPagtosClientes.alterar)
 		.delete(token.validarTokenRetaguarda, tiposPagtosClientes.deletar)
+
+router.route('/tipospagtoscliente/:pesquisa')
+		.get(token.validarTokenRetaguarda, tiposPagtosClientes.pesquisarTodos)
+
+//Fim Tipo pagamento Clientes
+
+/******Tipos pedidos******/
+router.route('/tipospedido')
+		.post(token.validarTokenRetaguarda, tiposPedidos.inserir)
+		.get(token.validarTokenRetaguarda, tiposPedidos.pesquisarTodos)
+		.put(token.validarTokenRetaguarda, tiposPedidos.alterar)
+		.delete(token.validarTokenRetaguarda, tiposPedidos.deletar)
 
 router.route('/tipospagtoscliente/:pesquisa')
 		.get(token.validarTokenRetaguarda, tiposPagtosClientes.pesquisarTodos)

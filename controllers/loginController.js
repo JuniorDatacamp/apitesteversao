@@ -6,6 +6,7 @@ const departamentos = require('../models/departamentos');
 const clientes = require('../models/clientes');
 const municipios = require('../models/municipios');
 const tiposPagtos = require('../models/tipoPagtos');
+const tiposPedido = require('../models/tiposPedido');
 const produtos = require('../models/produtos');
 const configuracoes = require('../models/configuracoes');
 const empresas = require('../models/empresa');
@@ -58,7 +59,8 @@ exports.login = function (req, res) {
                         municipios.retornarMunicipiosApp(objFullPackage),
                         produtos.retornarProdutosApp(objFullPackage),
                         empresas.retornarEmpresaApp(objFullPackage),
-                        clientes.documentosExistentes(objFullPackage)
+                        tiposPedido.retonarTiposPedidoApp(objFullPackage),
+                        clientes.documentosExistentes(objFullPackage)                        
                     ])
                     .then(
                         (resultados) => {
@@ -94,7 +96,8 @@ exports.login = function (req, res) {
                                         produtos: resultados[4],
                                         configuracao: config,
                                         empresa: resultados[5],
-                                        doctosClientes: resultados[6],
+                                        tiposPedido: resultados[6],
+                                        doctosClientes: resultados[7],
                         
                                         token: ResultToken
                                     });

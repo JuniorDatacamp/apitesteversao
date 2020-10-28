@@ -14,6 +14,7 @@ const sqlVendasApp =
             ven_uuid, ped_id, vdd_id, tpg_id, ven_data,
             ven_total, ven_tipo, ven_situacao, ven_observacao, 
             ven_tipo_venda, ven_urgente, ven_dt_entrega,
+            x.tpp_id, tpp_nome,
             case
                 when ven_id isnull then 'N'
             else 'S'
@@ -27,6 +28,8 @@ const sqlVendasApp =
                 v.*
                 from
             venda v) x
+        left join
+            tipos_pedido t on x.tpp_id = t.tpp_id
         where
             x.r <= 10 and (cast(vdd_id as varchar(10)) ilike $1)  `;
 

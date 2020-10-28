@@ -7,6 +7,7 @@ const departamentos = require('../models/departamentos');
 const clientes = require('../models/clientes');
 const municipios = require('../models/municipios');
 const tiposPagtos = require('../models/tipoPagtos');
+const tiposPedido = require('../models/tiposPedido');
 const produtos = require('../models/produtos');
 const configuracoes = require('../models/configuracoes');
 const empresas = require('../models/empresa');
@@ -54,7 +55,8 @@ exports.sincronizandoApp = function(req, res, isFull){
                 produtos.retornarProdutosApp(packageSync),
                 empresas.retornarEmpresaApp(packageSync),
                 ocorrencias.retornarOcorrencias(packageSync),
-                clientes.documentosExistentes(packageSync)
+                clientes.documentosExistentes(packageSync),
+                tiposPedido.retonarTiposPedidoApp(packageSync)
             ])
             .then(
                 (resultados) => {
@@ -69,7 +71,8 @@ exports.sincronizandoApp = function(req, res, isFull){
                         configuracao:  jsonConfiguracao,
                         empresa:  resultados[6],
                         ocorrencias: resultados[7].ocorrencias,
-                        doctosClientes: resultados[8]
+                        doctosClientes: resultados[8],
+                        tiposPedido: resultados[9]
                     });
                 },
                 (erro) => {
