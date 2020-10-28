@@ -55,8 +55,8 @@ exports.sincronizandoApp = function(req, res, isFull){
                 produtos.retornarProdutosApp(packageSync),
                 empresas.retornarEmpresaApp(packageSync),
                 ocorrencias.retornarOcorrencias(packageSync),
-                clientes.documentosExistentes(packageSync),
-                tiposPedido.retonarTiposPedidoApp(packageSync)
+                tiposPedido.retonarTiposPedidoApp(packageSync),
+                clientes.documentosExistentes(packageSync)                
             ])
             .then(
                 (resultados) => {
@@ -71,8 +71,8 @@ exports.sincronizandoApp = function(req, res, isFull){
                         configuracao:  jsonConfiguracao,
                         empresa:  resultados[6],
                         ocorrencias: resultados[7].ocorrencias,
-                        doctosClientes: resultados[8],
-                        tiposPedido: resultados[9]
+                        tiposPedido: resultados[8],
+                        doctosClientes: resultados[9]                        
                     });
                 },
                 (erro) => {
