@@ -159,6 +159,9 @@ exports.insertApp = function insertApp(ObjVendas){
         const ConexaoBanco = Configuracao.conexao;
         var resultVenda;
 
+        //Gambiarra por causa da retaguarda, trocou o campo por uma tabela.
+        aVenda.ven_tipo_venda = 'P';
+
         ConexaoBanco.query(textQueryInsertApp, [
             aVenda.cli_uuid, aVenda.cli_id, aVenda.vdd_id, aVenda.tpg_id, 
             aVenda.ven_data, aVenda.ven_total, aVenda.ven_observacao, aVenda.ven_tipo, aVenda.ven_tipo_venda, 
