@@ -101,7 +101,13 @@ exports.inserirApp = function(req, res){
         res.status(400).json({
             mensagem: 'A requisição não está de acordo com o formato esperado. Verifique o JSON "vendas" no body que está sendo enviado.'
         });
-    }
+    }    
+
+    if (!objVenda.itemvendas || objVenda.itemvendas.length === 0){
+        res.status(500).json({
+            mensagem: 'Item venda não informado!'
+        });
+    };
 
     Promise.all([
         vendasModel.insertApp(objVenda)
@@ -132,8 +138,8 @@ exports.inserirApp = function(req, res){
                 );
 
             }else{
-                funcUtils.getMensagemErros(erro, res);
-            };            
+                funcUtils.getMensagemErros(erro[0], res);
+            };
         }
     );
 };

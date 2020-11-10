@@ -546,6 +546,8 @@ exports.insertApp = function (cliente){
     const ConexaoBanco = Configuracao.conexao;
 
     return new Promise((resolve, reject) => {
+
+        console.log('Gravando cliente do aplicativo...', 'vendedor: ', oCliente.vdd_id, cliente);
     
         ConexaoBanco.query(insertClientesApp, [
             oCliente.vdd_id, oCliente.cli_nomefantasia, oCliente.cli_nome, oCliente.cli_endereco, oCliente.cli_bairro, 

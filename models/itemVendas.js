@@ -92,16 +92,13 @@ exports.insertApp = function insertApp(ObjItemVenda, venUUID){
         ConexaoBanco.query(sql, (error, results) => {
             
             if (error){
-                console.log('Erro ao inserir item venda. '+ error);
-                
-                ConexaoBanco.query('delete from venda where ven_uuid = $1', [venUUID], (error, results) => {
-
-                });
-
-                return reject(error);
+                console.log('Erro ao inserir item venda. ', 'ven_uuid:', venUUID);
+                console.log(error);
+                const erroItemVenda = [error, venUUID];
+                return reject(erroItemVenda);
             }
             else{
-                console.log(`Item venda inserido com sucesso! ven_uuid: ${paramsItemVenda[0]} Quantidade registros:`, results.rowCount);
+                console.log(`Item venda inserido com sucesso! ven_uuid: ${venUUID} Quantidade registros:`, results.rowCount, 'itens:', paramsItemVenda);
                 var itemVenda = results.rows;
                 return resolve(itemVenda);
             }

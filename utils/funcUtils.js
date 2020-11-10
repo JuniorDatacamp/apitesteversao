@@ -30,7 +30,7 @@ exports.getMensagemErros = function getMensagemErros(error, res){
             break;
 
         case 23503:
-            res.status(409).json({
+            res.status(500).json({
                 mensagem: "Erro ao executar o comando. FOREIGN KEY VIOLATION ",
                 tabela: error.table,
                 detalhe: error.detail});

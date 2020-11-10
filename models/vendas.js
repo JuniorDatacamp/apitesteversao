@@ -156,7 +156,9 @@ exports.getVendaDuplicadasApp = function(ven_cod_verificador){
 
 exports.insertApp = function insertApp(ObjVendas){
    
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
+
+        console.log('Gravando venda do aplicativo...', 'vendedor: ', ObjVendas.vdd_id, ObjVendas);
 
         const aVenda       = ObjVendas;        
         const ConexaoBanco = Configuracao.conexao;
@@ -173,14 +175,14 @@ exports.insertApp = function insertApp(ObjVendas){
         ], (error, results) => {
 
             if (error){
-                console.log('Erro ao gravar Venda.', error);
-
+                console.log('Erro ao gravar Venda do aplicativo.', ObjVendas, error);
                 const erroVenda = [error, aVenda];
-                
                 return reject(erroVenda);
             }
             else{
-                resultVenda         = {ven_uuid: results.rows[0].ven_uuid, ped_id: results.rows[0].ped_id};                    
+                console.log('Cabeçalho gravado com sucesso!', 'ven_uuid:', results.rows[0].ven_uuid, 'ped_id:', results.rows[0].ped_id, 'ven_cod_verificador:', aVenda.ven_cod_verificador);
+
+                resultVenda         = {ven_uuid: results.rows[0].ven_uuid, ped_id: results.rows[0].ped_id};
                 var arrayItemVenda  = [];
 
                 try {
@@ -193,13 +195,13 @@ exports.insertApp = function insertApp(ObjVendas){
                     return reject('A requisição não está de acordo com o formato esperado. Verifique o JSON "itemvendas" no body que está sendo enviado.')
                 }
 
-                Promise.resolve(itemVendaModel.insertApp(arrayItemVenda, resultVenda.ven_uuid))
+                itemVendaModel.insertApp(arrayItemVenda, resultVenda.ven_uuid)
                 .then(
-                    (resultados) => {
-                        return resolve(resultVenda);
+                    (resultados) => {                        
+                        return resolve(resultVenda);                        
                     },
-                    (rejeitado) => {
-                        resultVenda.mensagem = rejeitado;
+                    (rejeitado) => {                        
+                        resultVenda.mensagem = rejeitado;                        
                         return reject(resultVenda.mensagem);
                     }
                 )
