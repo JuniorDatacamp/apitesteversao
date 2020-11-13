@@ -92,10 +92,11 @@ exports.sincronizandoRetaguarda = function(req, res){
         (resultados) => {
 
             const whereClientes = format(' where cli_id is null or cli_dt_ultima_atualizacao > %L ', resultados.sco_dt_ultima_atualizacao);
+            const whereVendas = ' where ven_id is null group by v.ven_uuid ';
 
             Promise.all([
                 clientes.getClientesFormat(whereClientes),
-                vendas.getVendas(' where ven_id is null ')
+                vendas.getVendas(whereVendas)
             ])
             .then(
                 (resultados) => {

@@ -71,7 +71,9 @@ const sqlVendas =
             v.*,
             (select json_agg(ValorJson) from vw_agruparitemvendaJSON where ven_uuid = v.ven_uuid group by ven_uuid) as itemvendas
         from
-            venda v `;
+            venda v 
+        inner join
+            item_venda i on v.ven_uuid = i.ven_uuid `;
 
 const insertVenda =
     `   insert into venda
