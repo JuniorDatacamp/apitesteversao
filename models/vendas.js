@@ -31,7 +31,7 @@ const sqlVendasApp =
         left join
             tipos_pedido t on x.tpp_id = t.tpp_id
         where
-            x.r <= 10 and (cast(vdd_id as varchar(10)) ilike $1)  `;
+            x.r <= 3 and (cast(vdd_id as varchar(10)) ilike $1)  `;
 
 const sqlVendaDuplicada =
     `   select
