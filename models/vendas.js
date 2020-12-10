@@ -19,8 +19,7 @@ const sqlVendasApp =
                 when ven_id isnull then 'N'
             else 'S'
             end as recebimento,
-            'S' as enviado,
-            (select json_agg(ValorJson) from vw_agruparitemvendaJSON where ven_uuid = x.ven_uuid group by ven_uuid) as itemvendas,
+            'S' as enviado,            
             cli_uuid, cli_id
         from 
             (select
@@ -31,7 +30,7 @@ const sqlVendasApp =
         left join
             tipos_pedido t on x.tpp_id = t.tpp_id
         where
-            x.r <= 10 and (cast(vdd_id as varchar(10)) ilike $1)  `;
+            x.r <= 2 and (cast(vdd_id as varchar(10)) ilike $1)  `;
 
 const sqlVendaDuplicada =
     `   select
